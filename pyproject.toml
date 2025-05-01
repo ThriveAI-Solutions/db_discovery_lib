@@ -1,6 +1,6 @@
 [project]
 name = "db-discovery-lib"
-version = "0.1.1"
+version = "0.1.2"
 description = "Add your description here"
 readme = "README.md"
 authors = [
@@ -11,10 +11,11 @@ dependencies = [
     "openpyxl>=3.1.5",
     "pandas>=2.2.3",
     "psycopg[binary]>=3.2.7",
+    "typer>=0.15.3",
 ]
 
 [project.scripts]
-db-discovery-lib = "db_discovery_lib:main"
+db-discovery-lib = "db_discovery_lib.cli:app"
 
 [build-system]
 requires = ["hatchling"]
