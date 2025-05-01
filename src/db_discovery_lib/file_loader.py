@@ -54,7 +54,7 @@ def read_files_to_df(DB_NAME, USER, PASSWORD, HOST, PORT):
         df = df.rename(columns={'CCS': 'Cervical_Cancer_Screening'})
         df = df.rename(columns={'COL': 'Colorectal_Cancer_Screening'})
         return df
-
+    
     df_titanic = read_titanic()
     print(f'The data contains {df_titanic.shape[0]} rows and {df_titanic.shape[1]} columns of titanic data' )
     df_penguin = read_penguin()
