@@ -1,5 +1,6 @@
-import psycopg
 import pandas as pd
+import psycopg
+
 
 def get_connection_credentials(DB_NAME="postgres", USER="postgres", PASSWORD="admin", HOST="localhost", PORT="5432"):
     """Returns credentials for database connection."""
@@ -117,7 +118,7 @@ def test_potgresql_workflow():
         verify_query(connection)
 
     if connection and check_connection(connection):
-        Select_query(connection)
+        select_query(connection)
 
     if connection:
         connection.close()
@@ -160,12 +161,16 @@ def create_table_from_dataframe(df, table_name, dbname, user, password, host, po
                 cur.execute(create_table_query)
                 print(f"✅ Table '{table_name}' created or already exists.")
 
-                # Insert DataFrame data into the table
-                for _, row in df.iterrows():
-                    values = tuple(row.replace({pd.NA: None}))  # Replace NaNs with NULL values
-                    placeholders = ", ".join(["%s"] * len(values))  # Creates (%s, %s, ...)
-                    insert_query = f'INSERT INTO "{table_name}" VALUES ({placeholders});'
-                    cur.execute(insert_query, values)
+                # Insert DataFrame data into the table using executemany for better performance
+                placeholders = ", ".join(["%s"] * len(df.columns))  # Creates (%s, %s, ...)
+                insert_query = f'INSERT INTO "{table_name}" VALUES ({placeholders});'
+                
+                # Convert DataFrame to list of tuples, replacing NaNs with None
+                data_tuples = [tuple(row.replace({pd.NA: None}) if hasattr(row, 'replace') else 
+                                   [None if pd.isna(val) else val for val in row]) 
+                               for row in df.values]
+                
+                cur.executemany(insert_query, data_tuples)
 
                 conn.commit()
                 print(f"✅ Data inserted into '{table_name}' successfully.")
